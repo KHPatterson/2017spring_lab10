@@ -1,16 +1,22 @@
 #if !defined (HYBRID_H)
 #define HYBRID_H
 
+#include "DoubleNode.h"
 #include "QueueLinked.h"
 using CSC2110::QueueLinked;
 #include "SortedListDoublyLinked.h"
+#include <iostream>
+#include "text.h"
+using CSC2110::String;
+
+using namespace std;
 
 template < class T >
 class Hybrid
 {
 
    private:
-      QueueLinked<T>* q;
+      QueueLinked< DoubleNode<T> >* q;
       SortedListDoublyLinked<T>* sldl;
 
    public:
@@ -27,7 +33,8 @@ class Hybrid
 template < class T >
 Hybrid<T>::Hybrid(int (*comp_items) (T* item_1, T* item_2), int (*comp_keys) (String* key, T* item))
 {
-   q = new QueueLinked<T>();
+   //q = new QueueLinked<T>();
+   q = new QueueLinked< DoubleNode<T> >();
    sldl = new SortedListDoublyLinked<T>(comp_items, comp_keys);
 }
 
@@ -44,18 +51,64 @@ Hybrid<T>::~Hybrid()
 //simply comment the first implementation out when working on the second implementation
 //use the getKey method to dequeue/remove
 
-// DEQUEUE FUNCTION - first implementation.
-//    FIRST - dequeue to get the Item being removed.  use item->getkey() to get a string*
-//    SECOND - pass string to finder function.  This returns a doublenode.
-//    THIRD - We call the remove function.  Sorted_list->remove(DBN*)
-//    PROFIT?...
+template < class T >
+bool Hybrid<T>::isEmpty()
+{
+   return q->isEmpty();
+}
 
-// DEQUEUE FUNCTION - second implementation
-//    FIRST - dequeue the actual queue.  This returns the doublenode (called KILL) with all necessary pointers.
-//    SECOND - set temp pointers to bypass KILL. see pic from pseudo.
-//    THIRD - NULL temp pointers and kill the KILL item with deconstructor.
+template < class T >
+ListDoublyLinkedIterator<T>* Hybrid<T>::iterator()
+{
+   ListDoublyLinkedIterator<T>* iter = sldl->iterator();
+   return iter;
+}
 
 
+// FIRST IMPLEMENTATION
+/*
+template < class T >
+void Hybrid<T>::enqueue(T* item)
+{
+   q->enqueue(item);
+   sldl->add(item);
+}
 
+template < class T >
+T* Hybrid<T>::dequeue()
+{
+   T* item = q->dequeue();
+ 
+
+      cout << "yuup... it's dequeued" << endl;
+
+   String* str = item->getKey();
+   sldl->remove(str);
+
+      cout << "\twe called the remover" << endl;
+
+   return item;
+}
+*/
+
+
+// SECOND IMPLEMENTATION
+
+template < class T >
+void Hybrid<T>::enqueue(T* item)
+{
+   DoubleNode<T>* dbn = sldl->addDN(item);
+   q->enqueue(dbn);
+}
+
+
+template < class T >
+T* Hybrid<T>::dequeue()
+{
+   DoubleNode<T>* dbn = q->dequeue();
+   T* item = sldl->remove(dbn);
+
+   return item;
+}
 
 #endif

@@ -4,6 +4,9 @@
 #include "ListDoublyLinkedIterator.h"
 #include "Text.h"
 using CSC2110::String;
+#include <iostream>
+
+using namespace std;
 
 template < class T >
 class SortedListDoublyLinked
@@ -17,9 +20,6 @@ class SortedListDoublyLinked
       DoubleNode<T>* findLocationRemove(String* sk);
       DoubleNode<T>* locateNodeRemove(String* sk);
       DoubleNode<T>* locateNodeAdd(T* item);
-
-      DoubleNode<T>* addDN(T* item);
-      T* remove(DoubleNode<T>* curr);
 
       DoubleNode<T>* findHead();
       DoubleNode<T>* findTail();
@@ -38,6 +38,9 @@ class SortedListDoublyLinked
       T* get(String* sk);
       void add(T* item);
       void remove(String* sk);
+
+      DoubleNode<T>* addDN(T* item);
+      T* remove(DoubleNode<T>* curr);
 
       ListDoublyLinkedIterator<T>* iterator();
 
@@ -75,38 +78,44 @@ T* SortedListDoublyLinked<T>::remove(DoubleNode<T>* curr)
    //DO THIS (prev == NULL / after == NULL are special cases)
    //remember to set loc
 
-   loc = curr;
    T* item;
 
    DoubleNode<T>* prev;
    DoubleNode<T>* after;
 
-   if(loc->getPrev() == NULL)
-   {
-      item = loc->getItem();
+   prev = curr->getPrev();
+   after = curr->getNext();
 
-      after = loc->getNext();
-      after->setPrev(NULL);
+   if (curr == NULL)
+   {
+      return NULL;
    }
 
-   else if(loc->getNext() == NULL)
-   {
-      item = loc->getItem();
+   item = curr->getItem();
 
-      prev = loc->getPrev();
+   if (prev == NULL && after == NULL)
+   {
+      loc = NULL;
+   }
+
+   else if(prev == NULL && after != NULL)
+   {
+      after->setPrev(NULL);
+      loc = after;
+   }
+
+   else if(after == NULL && prev != NULL)
+   {
       prev->setNext(NULL);
+      loc = prev;
    }
 
    else
    {
-      prev = loc->getPrev();
-      after = loc->getNext();
-
       after->setPrev(prev);
-      prev->setNext(next);
+      prev->setNext(after);
 
-      item = loc->getItem();
-
+      loc = after;
    }
 
    sze--;
